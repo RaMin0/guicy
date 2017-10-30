@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>GUiCy</title>
+
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" type="text/css" href="//code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" type="text/css" href="//rawgit.com/GoogleChrome/dialog-polyfill/master/dialog-polyfill.css">
+    <link rel="stylesheet" type="text/css" href="/application.css">
+  </head>
+  <body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header mdl-layout--no-drawer-button">
+      <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+          <span class="mdl-layout-title">GUiCy</span>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--2-col"></div>
+          <div id="loading" class="mdl-cell mdl-cell--8-col" style="text-align: center;">
+            <div class="mdl-spinner mdl-js-spinner is-active"></div>
+          </div>
+          <div id="loading-failed" class="mdl-cell mdl-cell--8-col is-hidden" style="text-align: center;">
+            <p class="mdl-color-text--pink">Timed out</p>
+          </div>
+          <div id="content" class="mdl-cell mdl-cell--8-col is-hidden">
+            <h3>Hello, how may I help you today?</h3>
+            <div id="fns" class="mdl-grid mdl-grid--no-padding">
+              <div class="mdl-cell mdl-cell--6-col mdl-cell--12-col-tablet is-hidden">
+                <div class="mdl-card mdl-card--height-auto mdl-shadow--2dp">
+                  <div class="mdl-card__title">
+                    <h2 class="mdl-card__title-text"></h2>
+                  </div>
+                  <div class="mdl-card__supporting-text"></div>
+                  <div class="mdl-card__actions mdl-card--border">
+                    <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+                      Proceed
+                    </a>
+                  </div>
+                </div>
+                </div>
+            </div>
+            <div id="form" class="mdl-card mdl-card--height-auto mdl-shadow--2dp" style="display: none;">
+              <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text" style="flex: 1;">
+                  <span></span>
+                  <div class="mdl-layout-spacer"></div>
+                  <a id="back" class="mdl-button mdl-js-button mdl-button--icon">
+                    <i class="material-icons">close</i>
+                  </a>
+                </h2>
+              </div>
+              <div class="mdl-card__supporting-text">
+                <form>
+                  <input type="hidden" name="type" value="" />
+                  <div id="inputs">
+                    <div class="mdl-textfield mdl-textfield--floating-label is-hidden">
+                      <input class="mdl-textfield__input" />
+                      <label class="mdl-textfield__label"></label>
+                    </div>
+                  </div>
+                  <br />
+                  <input type="submit" value="Query" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" />
+                  <div id="progress" class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active is-hidden"></div>
+                  <span id="timeout" class="mdl-color-text--pink is-hidden">&nbsp;Timed out</span>
+                </form>
+
+                <div id="result" class="is-hidden">
+                  <hr />
+
+                  <div id="outputs">
+                    <div class="mdl-textfield mdl-textfield--floating-label is-hidden">
+                      <input class="mdl-textfield__input" readonly="readonly" />
+                      <label class="mdl-textfield__label mdl-textfield__label--enabled"></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mdl-cell mdl-cell--2-col"></div>
+        </div>
+      </main>
+      <footer class="mdl-mini-footer">
+        <div class="mdl-mini-footer__left-section">
+          &copy; 2017 GUiCy
+        </div>
+      </footer>
+    </div>
+
+    <script src="//code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="//cdn.rawgit.com/marioizquierdo/jquery.serializeJSON/master/jquery.serializejson.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="/application.js"></script>
+  </body>
+</html>

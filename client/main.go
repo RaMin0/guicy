@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -15,12 +16,19 @@ var (
 	pollURL      = flag.String("poll", "http://localhost:3000", "The base URL to poll")
 	pollInterval = flag.Duration("every", 5*time.Second, "The time interval between consequent polls")
 
-	fns = map[string]jobFn{
-		"student-data": job.StudentData,
+	fns = []jobFn{
+		job.StudentData,
+		job.SendNotification,
 	}
 )
 
-type jobFn func(interface{}) (interface{}, error)
+type jobFn interface {
+	Name() string
+	Description() string
+	Inputs() []map[string]string
+	Outputs() []map[string]string
+	Exec(interface{}) (interface{}, error)
+}
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -29,12 +37,10 @@ func init() {
 func main() {
 	flag.Parse()
 
-	pollTicker := time.NewTicker(*pollInterval)
-	for range pollTicker.C {
+	for {
 		log.Printf("Polling %s", *pollURL)
-		if err := poll(); err != nil {
-			log.Printf("- %v", err)
-		}
+		poll()
+		time.Sleep(*pollInterval)
 	}
 }
 
@@ -62,39 +68,64 @@ func poll() error {
 		log.Printf("- Received %d job(s):", l)
 	}
 
-	for _, job := range response.Jobs {
-		if fn, ok := fns[job.Type]; ok {
-			log.Printf("  * Executing %q as %q", job.ID, job.Type)
+jobsLoop:
+	for _, j := range response.Jobs {
+		for _, fn := range fns {
+			if j.Type == "discover" || j.Type == fmt.Sprint(fn) {
+				log.Printf("  * Executing %q as %q", j.ID, j.Type)
 
-			payload, err := fn(job.Request)
-			if err != nil {
-				log.Printf("    '--> %v", err)
-				continue
+				var (
+					payload interface{}
+					err     error
+				)
+				if j.Type == "discover" {
+					payload = discoverPayload()
+				} else {
+					payload, err = fn.Exec(j.Request)
+				}
+				if err != nil {
+					log.Printf("    '--> %v", err)
+					continue jobsLoop
+				}
+
+				request := map[string]interface{}{"payload": payload}
+				body, err := json.Marshal(request)
+				if err != nil {
+					log.Printf("    '--> %v", err)
+					continue jobsLoop
+				}
+
+				_, err = http.Post(
+					*pollURL+"/jobs/"+j.ID,
+					"application/json",
+					bytes.NewReader(body),
+				)
+				if err != nil {
+					log.Printf("    '--> %v", err)
+					continue jobsLoop
+				}
+
+				log.Print("    '--> Done")
+				continue jobsLoop
 			}
-
-			request := map[string]interface{}{"payload": payload}
-			body, err := json.Marshal(request)
-			if err != nil {
-				log.Printf("    '--> %v", err)
-				continue
-			}
-
-			_, err = http.Post(
-				*pollURL+"/jobs/"+job.ID,
-				"application/json",
-				bytes.NewReader(body),
-			)
-			if err != nil {
-				log.Printf("    '--> %v", err)
-				continue
-			}
-
-			log.Print("    '--> Done")
-			continue
 		}
 
-		log.Printf("  * Skipping %q as %q", job.ID, job.Type)
+		log.Printf("  * Skipping %q as %q", j.ID, j.Type)
 	}
 
 	return nil
+}
+
+func discoverPayload() interface{} {
+	jobs := make([]map[string]interface{}, 0, len(fns))
+	for _, fn := range fns {
+		jobs = append(jobs, map[string]interface{}{
+			"id":          fmt.Sprint(fn),
+			"name":        fn.Name(),
+			"description": fn.Description(),
+			"inputs":      fn.Inputs(),
+			"outputs":     fn.Outputs(),
+		})
+	}
+	return jobs
 }

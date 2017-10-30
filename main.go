@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -31,7 +33,8 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", withLog(handle))
+	http.Handle("/", http.FileServer(http.Dir("public")))
+	http.HandleFunc("/discover", withLog(handleDiscover))
 	http.HandleFunc("/requests", withLog(handleRequests))
 	http.HandleFunc("/requests/", withLog(handleRequest))
 	http.HandleFunc("/jobs", withLog(handleJobs))
@@ -59,8 +62,10 @@ func withLog(fn http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func handle(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "index.html")
+func handleDiscover(w http.ResponseWriter, r *http.Request) {
+	body, _ := json.Marshal(map[string]interface{}{"type": "discover"})
+	r.Body = ioutil.NopCloser(bytes.NewReader(body))
+	handleRequests(w, r)
 }
 
 func handleRequests(w http.ResponseWriter, r *http.Request) {

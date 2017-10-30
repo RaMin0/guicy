@@ -1,0 +1,23 @@
+.mdl-grid.mdl-grid--no-padding {
+  padding: 0;
+}
+
+.mdl-card {
+  width: 100% !important;
+}
+
+.mdl-card.mdl-card--height-auto {
+  min-height: auto;
+}
+
+.mdl-textfield__label--enabled {
+  color: rgb(63, 81, 181) !important;
+}
+
+.mdl-spinner {
+  vertical-align: middle;
+}
+
+.is-hidden {
+  display: none;
+}
