@@ -28,10 +28,6 @@
         vertical-align: middle;
       }
 
-      button[disabled="disabled"] .is-hidden {
-        display: inline-block;
-      }
-
       .is-hidden {
         display: none;
       }
@@ -63,13 +59,8 @@
                     <label class="mdl-textfield__label" for="id">ID</label>
                   </div>
                   <br />
-                  <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">
-                    Query
-                    <div class="is-hidden">
-                      &nbsp;
-                      <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>
-                    </div>
-                  </button>
+                  <input type="submit" value="Query" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" />
+                  <div id="progress" class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active is-hidden"></div>
                   <span id="timeout" class="mdl-color-text--pink is-hidden">&nbsp;Timed out</span>
                 </form>
 
@@ -109,7 +100,8 @@
       function poll(id, timeout) {
         $.get("/requests/"+id).done(function(data) {
           if (timeout === 0) {
-            $('form button').attr('disabled', false);
+            $('form input[type="submit"]').attr('disabled', false);
+            $('#progress').addClass('is-hidden');
             $('#timeout').removeClass('is-hidden');
             return;
           }
@@ -121,7 +113,8 @@
               }
             }
 
-            $('form button').attr('disabled', false);
+            $('form input[type="submit"]').attr('disabled', false);
+            $('#progress').addClass('is-hidden');
             $('#result').removeClass('is-hidden');
             $('main').scrollTo('#result', 'fast');
             return;
@@ -134,7 +127,8 @@
       $(document).on('submit', 'form', function(e) {
         e.preventDefault();
 
-        $('form button').attr('disabled', true);
+        $('form input[type="submit"]').attr('disabled', true);
+        $('#progress').removeClass('is-hidden');
         $('#timeout').addClass('is-hidden');
         $('#result').addClass('is-hidden');
 
